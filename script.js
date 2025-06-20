@@ -4,6 +4,7 @@ let words = [];
 let currentQuestionIndex = 0;
 let totalQuestions = 0;
 let score = 0;
+let selectedWords = []; // 選択された問題を保持
 
 // CSVファイルを読み込む関数
 async function loadCSV() {
@@ -31,7 +32,7 @@ function startQuiz() {
     }
 
     // ランダムに問題を選択
-    const selectedWords = [];
+    selectedWords = [];
     while (selectedWords.length < totalQuestions) {
         const randomIndex = Math.floor(Math.random() * filteredWords.length);
         const selectedWord = filteredWords[randomIndex];
@@ -42,13 +43,15 @@ function startQuiz() {
 
     currentQuestionIndex = 0;
     score = 0;
-    showQuestion(selectedWords);
+    document.getElementById('nextQuestion').style.display = 'none'; // 次の問題ボタンを非表示
+    showQuestion();
 }
 
 // 問題を表示する関数
-function showQuestion(selectedWords) {
+function showQuestion() {
     if (currentQuestionIndex >= selectedWords.length) {
         document.getElementById('quiz').innerHTML = `<p>クイズ終了！あなたの得点: ${score}/${totalQuestions}</p>`;
+        document.getElementById('nextQuestion').style.display = 'none'; // ボタンを非表示
         return;
     }
 
@@ -85,10 +88,7 @@ function checkAnswer(selected, correct) {
         document.getElementById('result').innerHTML = `<p>不正解。正しい答えは "${correct}" です。</p>`;
     }
     currentQuestionIndex++;
-    setTimeout(() => {
-        document.getElementById('result').innerHTML = ""; // 結果をクリア
-        showQuestion(selectedWords); // 次の問題を表示
-    }, 2000);
+    document.getElementById('nextQuestion').style.display = 'block'; // 次の問題ボタンを表示
 }
 
 // 配列をシャッフルする関数
@@ -99,6 +99,12 @@ function shuffleArray(array) {
     }
     return array;
 }
+
+// 次の問題に進む関数
+document.getElementById('nextQuestion').addEventListener('click', () => {
+    document.getElementById('result').innerHTML = ""; // 結果をクリア
+    showQuestion(); // 次の問題を表示
+});
 
 // DOMContentLoadedイベントで初期化
 document.addEventListener('DOMContentLoaded', () => {
