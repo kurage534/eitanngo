@@ -100,8 +100,8 @@ function shuffleArray(array) {
     return array;
 }
 
-// イベントリスナー
-document.getElementById('startQuiz').addEventListener('click', startQuiz);
-
-// 初期化
-loadCSV();
+// DOMContentLoadedイベントで初期化
+document.addEventListener('DOMContentLoaded', () => {
+    loadCSV();
+    document.getElementById('startQuiz').addEventListener('click', startQuiz);
+});
