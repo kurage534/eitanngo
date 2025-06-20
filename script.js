@@ -100,14 +100,12 @@ function shuffleArray(array) {
     return array;
 }
 
-// 次の問題に進む関数
-document.getElementById('nextQuestion').addEventListener('click', () => {
-    document.getElementById('result').innerHTML = ""; // 結果をクリア
-    showQuestion(); // 次の問題を表示
-});
-
 // DOMContentLoadedイベントで初期化
 document.addEventListener('DOMContentLoaded', () => {
     loadCSV();
     document.getElementById('startQuiz').addEventListener('click', startQuiz);
+    document.getElementById('nextQuestion').addEventListener('click', () => { // ここを修正
+        document.getElementById('result').innerHTML = ""; // 結果をクリア
+        showQuestion(); // 次の問題を表示
+    });
 });
