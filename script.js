@@ -5,6 +5,7 @@ let currentQuestionIndex = 0;
 let totalQuestions = 0;
 let score = 0;
 let selectedWords = []; // 選択された問題を保持
+let userSelectedAnswer = null; // ユーザーが選択した答えを保持
 
 // CSVファイルを読み込む関数
 async function loadCSV() {
@@ -60,9 +61,34 @@ function showQuestion() {
     const quizHtml = `
         <p>単語の意味は何ですか？</p>
         <p>${currentWord.meaning}</p>
-        ${options.map(option => `<div class="answer" onclick="checkAnswer('${option.word}', '${currentWord.word}')">${option.word}</div>`).join('')}
+        ${options.map(option => `<div class="answer" onclick="selectAnswer('${option.word}')">${option.word}</div>`).join('')}
     `;
     document.getElementById('quiz').innerHTML = quizHtml;
+    userSelectedAnswer = null; // ユーザーの選択をリセット
+}
+
+// ユーザーが選択肢を選んだときの処理
+function selectAnswer(answer) {
+    userSelectedAnswer = answer; // ユーザーの選択を記録
+}
+
+// 正誤判定を行う関数
+function checkAnswer() {
+    const currentWord = selectedWords[currentQuestionIndex];
+    if (!userSelectedAnswer) {
+        // ユーザーが何も選択していない場合
+        document.getElementById('result').innerHTML = `<p>不正解。選択肢を選んでください。</p>`;
+    } else {
+        const isCorrect = userSelectedAnswer === currentWord.word;
+        if (isCorrect) {
+            score++;
+            document.getElementById('result').innerHTML = "<p>正解！</p>";
+        } else {
+            document.getElementById('result').innerHTML = `<p>不正解。正しい答えは "${currentWord.word}" です。</p>`;
+        }
+    }
+    currentQuestionIndex++;
+    document.getElementById('nextQuestion').style.display = 'block'; // 次の問題ボタンを表示
 }
 
 // 選択肢を生成する関数
@@ -78,19 +104,6 @@ function generateOptions(currentWord, selectedWords) {
     return shuffleArray(options);
 }
 
-// 正誤判定を行う関数
-function checkAnswer(selected, correct) {
-    const isCorrect = selected === correct;
-    if (isCorrect) {
-        score++;
-        document.getElementById('result').innerHTML = "<p>正解！</p>";
-    } else {
-        document.getElementById('result').innerHTML = `<p>不正解。正しい答えは "${correct}" です。</p>`;
-    }
-    currentQuestionIndex++;
-    document.getElementById('nextQuestion').style.display = 'block'; // 次の問題ボタンを表示
-}
-
 // 配列をシャッフルする関数
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -104,8 +117,8 @@ function shuffleArray(array) {
 document.addEventListener('DOMContentLoaded', () => {
     loadCSV();
     document.getElementById('startQuiz').addEventListener('click', startQuiz);
-    document.getElementById('nextQuestion').addEventListener('click', () => { // ここを修正
-        document.getElementById('result').innerHTML = ""; // 結果をクリア
+    document.getElementById('nextQuestion').addEventListener('click', () => {
+        checkAnswer(); // 正誤判定を行う
         showQuestion(); // 次の問題を表示
     });
 });
