@@ -84,6 +84,8 @@ function generateOptions(currentWord) {
         if (!options.includes(randomWord)) {
             options.push(randomWord);
         }
+        // 使用可能な単語が減った場合、再度フィルタリング
+        availableWords.splice(availableWords.indexOf(randomWord), 1);
     }
     return shuffleArray(options);
 }
