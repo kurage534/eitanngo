@@ -1,60 +1,87 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 20px;
+/* テキストサイズの調整 */
+html {
+    -ms-text-size-adjust: 100%; /* IE用 */
+    -webkit-text-size-adjust: 100%; /* Safari用 */
+    text-size-adjust: 100%; /* 現代のブラウザ用 */
 }
 
-#container {
-    max-width: 600px;
-    margin: 0 auto;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+/* バックドロップフィルター */
+.element {
+    -webkit-backdrop-filter: blur(10px); /* Safari用 */
+    backdrop-filter: blur(10px); /* 現代のブラウザ用 */
 }
 
-h1 {
-    text-align: center;
+/* ユーザー選択 */
+.user-select {
+    -webkit-user-select: none; /* Safari用 */
+    user-select: none; /* 現代のブラウザ用 */
 }
 
-label {
-    display: block;
-    margin: 10px 0 5px;
+/* アプリ領域 */
+.app-region {
+    -webkit-app-region: drag; /* Firefox、Safariではサポートされていない */
 }
 
-input[type="number"] {
-    width: 50px;
+/* テキスト装飾スキップ */
+.text-decoration {
+    -webkit-text-decoration-skip: objects; /* Chrome、Firefoxではサポートされていない */
 }
 
-button {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
+/* ユーザーのドラッグ */
+.user-drag {
+    -webkit-user-drag: none; /* Firefoxではサポートされていない */
 }
 
-button:hover {
-    background-color: #218838;
+/* 色調整 */
+.color-adjust {
+    forced-color-adjust: auto; /* Safariではサポートされていない */
 }
 
-.answer {
-    background-color: #007bff;
-    color: white;
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 5px;
-    cursor: pointer;
+/* 最小高さ */
+.min-height {
+    min-height: auto; /* Firefox 22+ではサポートされていない */
 }
 
-.answer:hover {
-    background-color: #0056b3;
+/* スクロールバーの色 */
+.scrollbar {
+    scrollbar-color: #888 #f4f4f4; /* Safariではサポートされていない */
+    scrollbar-width: thin; /* Safariではサポートされていない */
 }
 
-#result {
-    margin-top: 10px;
-    font-weight: bold;
+/* ズーム */
+.zoom {
+    zoom: 1; /* Firefox < 126ではサポートされていない */
+}
+
+/* レイアウトトリガーの警告 */
+@keyframes example {
+    from {
+        height: 100px; /* レイアウトトリガーの警告 */
+        left: 0; /* レイアウトトリガーの警告 */
+        width: 100px; /* レイアウトトリガーの警告 */
+    }
+    to {
+        height: 200px; /* レイアウトトリガーの警告 */
+        left: 100px; /* レイアウトトリガーの警告 */
+        width: 200px; /* レイアウトトリガーの警告 */
+    }
+}
+
+/* 背景クリップ */
+.background-clip {
+    -webkit-background-clip: text; /* Safari用 */
+    background-clip: text; /* 現代のブラウザ用 */
+}
+
+/* フレックスボックス */
+.flex-container {
+    display: -webkit-box; /* 古いブラウザ用 */
+    display: -webkit-flex; /* 古いブラウザ用 */
+    display: flex; /* 現代のブラウザ用 */
+}
+
+/* タブサイズ */
+.tab-size {
+    -moz-tab-size: 4; /* Firefox用 */
+    tab-size: 4; /* 現代のブラウザ用 */
 }
