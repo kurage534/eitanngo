@@ -8,6 +8,15 @@
 </head>
 <body>
     <h1>単語クイズ</h1>
+    
+    <div>
+        <label for="start">開始番号:</label>
+        <input type="number" id="start" value="1" min="1" max="1900">
+        
+        <label for="end">終了番号:</label>
+        <input type="number" id="end" value="1900" min="1" max="1900">
+    </div>
+    
     <button id="generate">問題を出題</button>
     <div id="quiz"></div>
 
