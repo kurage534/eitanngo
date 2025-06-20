@@ -9,15 +9,25 @@ async function loadCSV() {
     const rows = data.split('\n').slice(1); // ヘッダーを除く
     words = rows.map(row => {
         const [number, word, meaning] = row.split(',');
-        return { number, word, meaning };
+        return { number: parseInt(number), word, meaning };
     });
 }
 
 // ランダムな単語を選んで表示する関数
 function generateQuestion() {
-    if (words.length === 0) return;
-    const randomIndex = Math.floor(Math.random() * words.length);
-    const selectedWord = words[randomIndex];
+    const start = parseInt(document.getElementById('start').value);
+    const end = parseInt(document.getElementById('end').value);
+
+    // 指定された範囲の単語をフィルタリング
+    const filteredWords = words.filter(word => word.number >= start && word.number <= end);
+    
+    if (filteredWords.length === 0) {
+        document.getElementById('quiz').innerHTML = "<p>指定された範囲に単語がありません。</p>";
+        return;
+    }
+
+    const randomIndex = Math.floor(Math.random() * filteredWords.length);
+    const selectedWord = filteredWords[randomIndex];
     document.getElementById('quiz').innerHTML = `<p>単語: ${selectedWord.word}</p><p>意味: ${selectedWord.meaning}</p>`;
 }
 
