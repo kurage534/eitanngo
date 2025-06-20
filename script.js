@@ -5,6 +5,7 @@ let currentQuestionIndex = 0;
 let totalQuestions = 0;
 let score = 0;
 let selectedWords = []; // 選択された問題を保持
+let usedWords = []; // 既に出題された単語を保持
 
 // CSVファイルを読み込む関数
 async function loadCSV() {
@@ -33,11 +34,18 @@ function startQuiz() {
 
     // ランダムに問題を選択
     selectedWords = [];
+    usedWords = []; // 新しいクイズのためにリセット
+
+    // フィルタリングした単語からランダムに選択
     while (selectedWords.length < totalQuestions) {
         const randomIndex = Math.floor(Math.random() * filteredWords.length);
         const selectedWord = filteredWords[randomIndex];
-        if (!selectedWords.includes(selectedWord)) {
+        if (!selectedWords.includes(selectedWord) && !usedWords.includes(selectedWord.word)) {
             selectedWords.push(selectedWord);
+        }
+        // もし全ての単語が使用済みなら、ループを抜ける
+        if (selectedWords.length >= filteredWords.length) {
+            break;
         }
     }
 
@@ -56,7 +64,7 @@ function showQuestion() {
     }
 
     const currentWord = selectedWords[currentQuestionIndex];
-    const options = generateOptions(currentWord, selectedWords);
+    const options = generateOptions(currentWord);
     const quizHtml = `
         <p>単語の意味は何ですか？</p>
         <p>${currentWord.meaning}</p>
@@ -66,11 +74,13 @@ function showQuestion() {
 }
 
 // 選択肢を生成する関数
-function generateOptions(currentWord, selectedWords) {
+function generateOptions(currentWord) {
     const options = [currentWord];
-    while (options.length < 4) {
-        const randomIndex = Math.floor(Math.random() * selectedWords.length);
-        const randomWord = selectedWords[randomIndex];
+    const availableWords = selectedWords.filter(word => !usedWords.includes(word.word)); // 使用可能な単語リスト
+
+    while (options.length < 4 && availableWords.length > 0) {
+        const randomIndex = Math.floor(Math.random() * availableWords.length);
+        const randomWord = availableWords[randomIndex];
         if (!options.includes(randomWord)) {
             options.push(randomWord);
         }
@@ -87,6 +97,7 @@ function checkAnswer(selected, correct) {
     } else {
         document.getElementById('result').innerHTML = `<p>不正解。正しい答えは "${correct}" です。</p>`;
     }
+    usedWords.push(selectedWords[currentQuestionIndex].word); // 出題済みの単語を追加
     currentQuestionIndex++;
     document.getElementById('nextQuestion').style.display = 'block'; // 次の問題ボタンを表示
 }
@@ -104,7 +115,7 @@ function shuffleArray(array) {
 document.addEventListener('DOMContentLoaded', () => {
     loadCSV();
     document.getElementById('startQuiz').addEventListener('click', startQuiz);
-    document.getElementById('nextQuestion').addEventListener('click', () => { // ここを修正
+    document.getElementById('nextQuestion').addEventListener('click', () => {
         document.getElementById('result').innerHTML = ""; // 結果をクリア
         showQuestion(); // 次の問題を表示
     });
