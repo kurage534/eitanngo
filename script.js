@@ -78,14 +78,13 @@ function generateOptions(currentWord) {
     const options = [currentWord];
     const availableWords = selectedWords.filter(word => !usedWords.includes(word.word)); // 使用可能な単語リスト
 
-    while (options.length < 4 && availableWords.length > 0) {
+    // 常に4つの選択肢を生成
+    while (options.length < 4) {
         const randomIndex = Math.floor(Math.random() * availableWords.length);
         const randomWord = availableWords[randomIndex];
         if (!options.includes(randomWord)) {
             options.push(randomWord);
         }
-        // 使用可能な単語が減った場合、再度フィルタリング
-        availableWords.splice(availableWords.indexOf(randomWord), 1);
     }
     return shuffleArray(options);
 }
