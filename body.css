@@ -1,65 +1,50 @@
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
-    margin: 0;
+    margin: 20px;
     padding: 20px;
-}
-
-#container {
-    max-width: 600px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
-    text-align: center;
+    color: #333;
 }
 
-label {
-    display: block;
-    margin: 10px 0 5px;
+div {
+    margin-bottom: 15px;
 }
 
 input[type="number"] {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    width: 60px;
+    margin-right: 10px;
 }
 
 button {
-    width: 100%;
-    padding: 10px;
-    background-color: #28a745;
+    background-color: #28a745; /* 緑色 */
     color: white;
     border: none;
+    padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 16px;
 }
 
 button:hover {
-    background-color: #218838;
-}
-
-#quiz {
-    margin: 20px 0;
+    background-color: #218838; /* ホバー時の色 */
 }
 
 .answer {
+    background-color: #007bff; /* 青色 */
+    color: white;
     padding: 10px;
     margin: 5px 0;
-    background-color: #007bff;
-    color: white;
     border-radius: 5px;
     cursor: pointer;
 }
 
 .answer:hover {
-    background-color: #0056b3;
+    background-color: #0056b3; /* ホバー時の色 */
 }
 
 #result {
