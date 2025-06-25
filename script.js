@@ -103,7 +103,10 @@ function shuffleArray(array) {
 // ランキングを更新する関数
 function updateRanking() {
     const playerName = prompt("あなたの名前を入力してください:");
-    rankings.push({ name: playerName, score: score }); // ランキングに追加
+    if (!playerName) return; // 名前が入力されなかった場合は何もしない
+
+    // ランキングに追加
+    rankings.push({ name: playerName, score: score, questions: totalQuestions });
     displayRanking(); // ランキングを表示
 }
 
@@ -116,7 +119,7 @@ function displayRanking() {
     const sortedRankings = rankings.sort((a, b) => b.score - a.score);
     sortedRankings.forEach((entry, index) => {
         const row = document.createElement('tr');
-        row.innerHTML = `<td>${index + 1}</td><td>${entry.name}</td><td>${entry.score}</td>`;
+        row.innerHTML = `<td>${index + 1}</td><td>${entry.name}</td><td>${entry.score}</td><td>${entry.questions}</td>`; // 問題数を表示
         rankingBody.appendChild(row);
     });
 }
