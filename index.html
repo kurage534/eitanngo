@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>単語クイズ</title>
-    <link rel="stylesheet" href="body.css"> <!-- CSSファイルのリンク -->
+    <link rel="stylesheet" href="style.css"> <!-- CSSファイルのリンク -->
 </head>
 <body>
     <h1>単語クイズ</h1>
@@ -26,13 +26,14 @@
     <button id="nextQuestion" style="display:none;">次の問題へ進む</button> <!-- 次の問題ボタン -->
 
     <div id="ranking">
-        <h2>ランキング表</h2>
+        <h2>ランキング表 (得点と確率)</h2>
         <table>
             <thead>
                 <tr>
                     <th>順位</th>
                     <th>プレイヤー名</th>
                     <th>得点</th>
+                    <th>確率</th> <!-- 確率の列 -->
                 </tr>
             </thead>
             <tbody id="ranking-body">
