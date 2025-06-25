@@ -34,20 +34,9 @@ button:hover {
     background-color: #218838; /* ホバー時の色 */
 }
 
-.answer {
-    background-color: #007bff; /* 青色 */
-    color: white;
-    padding: 10px;
-    margin: 5px 0;
+#ranking {
+    background-color: #f9f9f9;
+    padding: 20px;
     border-radius: 5px;
-    cursor: pointer;
-}
-
-.answer:hover {
-    background-color: #0056b3; /* ホバー時の色 */
-}
-
-#result {
-    margin-top: 20px;
-    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
