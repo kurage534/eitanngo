@@ -3,7 +3,7 @@ let currentQuestionIndex = 0;
 let totalQuestions = 0;
 let score = 0;
 let selectedWords = []; // 選択された問題を保持
-let rankings = []; // ランキングを保持
+let rankings = {}; // 出題数ごとのランキングを保持
 
 // CSVファイルを読み込む関数
 async function loadCSV() {
@@ -105,23 +105,36 @@ function updateRanking() {
     const playerName = prompt("あなたの名前を入力してください:");
     if (!playerName) return; // 名前が入力されなかった場合は何もしない
 
+    if (!rankings[totalQuestions]) {
+        rankings[totalQuestions] = []; // 新しい出題数のランキングを初期化
+    }
+
     // ランキングに追加
-    rankings.push({ name: playerName, score: score, questions: totalQuestions });
+    rankings[totalQuestions].push({ name: playerName, score: score });
     displayRanking(); // ランキングを表示
 }
 
 // ランキングを表示する関数
 function displayRanking() {
-    const rankingBody = document.getElementById('ranking-body');
-    rankingBody.innerHTML = ''; // 既存のデータをクリア
+    const rankingsContainer = document.getElementById('rankings');
+    rankingsContainer.innerHTML = ''; // 既存のデータをクリア
 
-    // 得点でソート
-    const sortedRankings = rankings.sort((a, b) => b.score - a.score);
-    sortedRankings.forEach((entry, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `<td>${index + 1}</td><td>${entry.name}</td><td>${entry.score}</td><td>${entry.questions}</td>`; // 問題数を表示
-        rankingBody.appendChild(row);
-    });
+    // 各出題数のランキングを表示
+    for (const questionCount in rankings) {
+        const rankingBody = document.createElement('div');
+        rankingBody.innerHTML = `<h3>${questionCount} 問出題のランキング</h3><table><thead><tr><th>順位</th><th>プレイヤー名</th><th>得点</th></tr></thead><tbody></tbody></table>`;
+        const tbody = rankingBody.querySelector('tbody');
+
+        // 得点でソート
+        const sortedRankings = rankings[questionCount].sort((a, b) => b.score - a.score);
+        sortedRankings.forEach((entry, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${index + 1}</td><td>${entry.name}</td><td>${entry.score}</td>`;
+            tbody.appendChild(row);
+        });
+
+        rankingsContainer.appendChild(rankingBody); // ランキングを追加
+    }
 }
 
 // DOMContentLoadedイベントで初期化
