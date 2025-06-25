@@ -3,7 +3,7 @@ let currentQuestionIndex = 0;
 let totalQuestions = 0;
 let score = 0;
 let selectedWords = []; // 選択された問題を保持
-let rankings = []; // ランキングを保持
+let rankings = {}; // プレイヤーのランキングを保持
 
 // CSVファイルを読み込む関数
 async function loadCSV() {
@@ -103,7 +103,15 @@ function shuffleArray(array) {
 // ランキングを更新する関数
 function updateRanking() {
     const playerName = prompt("あなたの名前を入力してください:");
-    rankings.push({ name: playerName, score: score }); // ランキングに追加
+    if (!playerName) return; // 名前が入力されなかった場合は何もしない
+
+    if (!rankings[playerName]) {
+        rankings[playerName] = { totalScore: 0, totalAttempts: 0 }; // 新規プレイヤー
+    }
+    
+    rankings[playerName].totalScore += score; // スコアを加算
+    rankings[playerName].totalAttempts += 1; // 試行回数を加算
+
     displayRanking(); // ランキングを表示
 }
 
@@ -113,10 +121,16 @@ function displayRanking() {
     rankingBody.innerHTML = ''; // 既存のデータをクリア
 
     // 得点でソート
-    const sortedRankings = rankings.sort((a, b) => b.score - a.score);
+    const sortedRankings = Object.entries(rankings).map(([name, data]) => ({
+        name,
+        totalScore: data.totalScore,
+        totalAttempts: data.totalAttempts,
+        probability: (data.totalScore / data.totalAttempts).toFixed(2) // 確率を計算
+    })).sort((a, b) => b.totalScore - a.totalScore);
+
     sortedRankings.forEach((entry, index) => {
         const row = document.createElement('tr');
-        row.innerHTML = `<td>${index + 1}</td><td>${entry.name}</td><td>${entry.score}</td>`;
+        row.innerHTML = `<td>${index + 1}</td><td>${entry.name}</td><td>${entry.totalScore}</td><td>${entry.probability}</td>`;
         rankingBody.appendChild(row);
     });
 }
