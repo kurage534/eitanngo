@@ -2,7 +2,7 @@ let words = [];
 let currentQuestionIndex = 0;
 let totalQuestions = 0;
 let score = 0;
-let scores = []; // スコアを格納する配列
+let selectedWords = []; // 選択された問題を保持
 
 // CSVファイルを読み込む関数
 async function loadCSV() {
@@ -33,10 +33,13 @@ function startQuiz() {
 function displayQuestion() {
     if (currentQuestionIndex < selectedWords.length) {
         const question = selectedWords[currentQuestionIndex];
+        const options = generateOptions(question.meaning); // 選択肢を生成
         const quizHtml = `
             <div>
                 <p>問題 ${currentQuestionIndex + 1}: ${question.word}</p>
-                <button onclick="checkAnswer('${question.meaning}')">答える</button>
+                ${options.map((option, index) => `
+                    <button onclick="checkAnswer('${option}', '${question.meaning}')">${option}</button>
+                `).join('')}
             </div>
         `;
         document.getElementById('quiz').innerHTML = quizHtml;
@@ -45,9 +48,8 @@ function displayQuestion() {
     }
 }
 
-// 答えをチェックする関数
-function checkAnswer(selectedMeaning) {
-    const correctMeaning = selectedWords[currentQuestionIndex].meaning;
+// 正解をチェックする関数
+function checkAnswer(selectedMeaning, correctMeaning) {
     if (selectedMeaning === correctMeaning) {
         score++;
     }
@@ -86,6 +88,18 @@ function displayRanking() {
 // 配列をシャッフルする関数
 function shuffleArray(array) {
     return array.sort(() => Math.random() - 0.5);
+}
+
+// 選択肢を生成する関数
+function generateOptions(correctAnswer) {
+    const incorrectAnswers = words
+        .filter(word => word.meaning !== correctAnswer)
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 3) // 3つの不正解を選ぶ
+        .map(word => word.meaning);
+    
+    const options = [correctAnswer, ...incorrectAnswers];
+    return shuffleArray(options); // 正解と不正解を混ぜる
 }
 
 // イベントリスナーの設定
