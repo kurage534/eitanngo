@@ -1,10 +1,9 @@
-// script.js
-
 let words = [];
 let currentQuestionIndex = 0;
 let totalQuestions = 0;
 let score = 0;
 let selectedWords = []; // 選択された問題を保持
+let rankings = []; // ランキングを保持
 
 // CSVファイルを読み込む関数
 async function loadCSV() {
@@ -52,6 +51,7 @@ function showQuestion() {
     if (currentQuestionIndex >= selectedWords.length) {
         document.getElementById('quiz').innerHTML = `<p>クイズ終了！あなたの得点: ${score}/${totalQuestions}</p>`;
         document.getElementById('nextQuestion').style.display = 'none'; // ボタンを非表示
+        updateRanking(); // ランキングを更新
         return;
     }
 
@@ -100,11 +100,32 @@ function shuffleArray(array) {
     return array;
 }
 
+// ランキングを更新する関数
+function updateRanking() {
+    const playerName = prompt("あなたの名前を入力してください:");
+    rankings.push({ name: playerName, score: score }); // ランキングに追加
+    displayRanking(); // ランキングを表示
+}
+
+// ランキングを表示する関数
+function displayRanking() {
+    const rankingBody = document.getElementById('ranking-body');
+    rankingBody.innerHTML = ''; // 既存のデータをクリア
+
+    // 得点でソート
+    const sortedRankings = rankings.sort((a, b) => b.score - a.score);
+    sortedRankings.forEach((entry, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${index + 1}</td><td>${entry.name}</td><td>${entry.score}</td>`;
+        rankingBody.appendChild(row);
+    });
+}
+
 // DOMContentLoadedイベントで初期化
 document.addEventListener('DOMContentLoaded', () => {
     loadCSV();
     document.getElementById('startQuiz').addEventListener('click', startQuiz);
-    document.getElementById('nextQuestion').addEventListener('click', () => { // ここを修正
+    document.getElementById('nextQuestion').addEventListener('click', () => {
         document.getElementById('result').innerHTML = ""; // 結果をクリア
         showQuestion(); // 次の問題を表示
     });
