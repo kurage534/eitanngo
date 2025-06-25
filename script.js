@@ -119,6 +119,7 @@ function displayRanking() {
 
     for (const questionCount in rankings) {
         const rankingBody = document.createElement('div');
+        rankingBody.classList.add('ranking-section'); // クラスを追加
         rankingBody.innerHTML = `<h3>${questionCount} 問出題のランキング</h3><table><thead><tr><th>順位</th><th>プレイヤー名</th><th>得点</th></tr></thead><tbody></tbody></table>`;
         const tbody = rankingBody.querySelector('tbody');
 
