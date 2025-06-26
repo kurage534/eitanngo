@@ -19,6 +19,17 @@ let lastCorrectAnswer = null;
 document.getElementById('startButton').addEventListener('click', startQuiz);
 document.getElementById('nextButton').addEventListener('click', nextQuestion);
 document.getElementById('backButton').addEventListener('click', resetQuiz);
+document.getElementById('showRankingButton').addEventListener('click', () => {
+    showRanking();
+});
+document.getElementById('closeRankingButton').addEventListener('click', () => {
+    document.getElementById('ranking').classList.add('hidden');
+    document.getElementById('settings').classList.remove('hidden');
+});
+document.getElementById('filterRankingButton').addEventListener('click', () => {
+    const count = parseInt(document.getElementById('rankingQuestionCount').value);
+    showRanking(isNaN(count) ? null : count);
+});
 
 function startQuiz() {
     const startNum = parseInt(document.getElementById('startNum').value);
@@ -79,11 +90,9 @@ function nextQuestion() {
 }
 
 function getRandomQuestion() {
-    // 出題単語をランダム取得（被り防止したい場合はselectedRangeから除外していくと良い）
     const correctAnswer = selectedRange[Math.floor(Math.random() * selectedRange.length)];
     const options = [correctAnswer];
 
-    // 選択肢数は範囲内単語数まで
     while (options.length < Math.min(5, selectedRange.length)) {
         const randomOption = selectedRange[Math.floor(Math.random() * selectedRange.length)];
         if (!options.includes(randomOption)) {
@@ -116,7 +125,13 @@ function checkAnswer(selectedOption) {
 function endQuiz() {
     document.getElementById('quiz').classList.add('hidden');
     document.getElementById('backButton').classList.remove('hidden');
-    alert(`クイズ終了! 正解数: ${correctAnswers} / ${totalQuestions}`);
+    // --- ランキング登録 ---
+    setTimeout(() => {
+        let userName = prompt("クイズ終了! 正解数: " + correctAnswers + " / " + totalQuestions + "\n名前を入力してください（ランキングに登録されます）:");
+        if (!userName) userName = "名無し";
+        saveRanking(userName, correctAnswers, totalQuestions);
+        showRanking(totalQuestions);
+    }, 100); // alertの後にpromptを表示するためtimeout
 }
 
 function resetQuiz() {
@@ -129,10 +144,53 @@ function resetQuiz() {
 }
 
 function shuffleArray(array) {
-    // Fisher-Yatesシャッフル
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
+}
+
+// --- ランキング機能 ---
+
+function saveRanking(userName, score, questionCount) {
+    let rankings = JSON.parse(localStorage.getItem("rankings") || '{}');
+    if (!rankings[questionCount]) rankings[questionCount] = [];
+    rankings[questionCount].push({ name: userName, score: score, date: new Date().toLocaleString() });
+    // スコア降順で並べ替え、上位5件だけ残す
+    rankings[questionCount].sort((a, b) => b.score - a.score);
+    rankings[questionCount] = rankings[questionCount].slice(0, 5);
+    localStorage.setItem("rankings", JSON.stringify(rankings));
+}
+
+function showRanking(questionCount = null) {
+    document.getElementById('settings').classList.add('hidden');
+    document.getElementById('quiz').classList.add('hidden');
+    document.getElementById('backButton').classList.add('hidden');
+    document.getElementById('ranking').classList.remove('hidden');
+
+    let rankings = JSON.parse(localStorage.getItem("rankings") || '{}');
+    let list = document.getElementById('rankingList');
+    list.innerHTML = "";
+
+    // 出題数で絞り込み
+    let keys = Object.keys(rankings).sort((a, b) => parseInt(a) - parseInt(b));
+    if (questionCount !== null) {
+        keys = keys.filter(k => parseInt(k) === questionCount);
+    }
+
+    if (keys.length === 0) {
+        list.innerHTML = "<li>ランキングはありません</li>";
+        return;
+    }
+    keys.forEach(qc => {
+        let title = document.createElement('li');
+        title.innerHTML = `<strong>【出題数: ${qc}】</strong>`;
+        list.appendChild(title);
+        rankings[qc].forEach((entry, idx) => {
+            let li = document.createElement('li');
+            li.textContent = ` ${idx + 1}位: ${entry.name} - ${entry.score}点 (${entry.date})`;
+            list.appendChild(li);
+        });
+    });
 }
