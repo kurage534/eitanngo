@@ -1,22 +1,40 @@
-const words = [
-    { number: 1, word: "apple", meaning: "りんご" },
-    { number: 2, word: "banana", meaning: "バナナ" },
-    { number: 3, word: "grape", meaning: "ぶどう" },
-    { number: 4, word: "orange", meaning: "オレンジ" },
-    { number: 5, word: "peach", meaning: "もも" },
-    { number: 6, word: "kiwi", meaning: "キウイ" },
-    { number: 7, word: "strawberry", meaning: "いちご" },
-    { number: 8, word: "melon", meaning: "メロン" },
-    // 必要に応じて単語を追加
-];
-
+let words = [];
 let currentQuestionIndex = 0;
 let correctAnswers = 0;
 let totalQuestions = 0;
 let selectedRange = [];
 let lastCorrectAnswer = null;
 
-document.getElementById('startButton').addEventListener('click', startQuiz);
+// CSVを配列に変換する関数
+function parseCSV(text) {
+    const lines = text.trim().split(/\r?\n/);
+    return lines.map(line => {
+        let [number, word, meaning] = line.replace(/^﻿/, '').split(',');
+        number = parseInt(number, 10);
+        return { number, word, meaning };
+    });
+}
+
+// CSVロード
+function loadWordsCSV() {
+    return fetch('words.csv')
+        .then(response => {
+            if (!response.ok) throw new Error('CSVの読み込みに失敗しました');
+            return response.text();
+        })
+        .then(text => {
+            words = parseCSV(text);
+        });
+}
+
+// イベントリスナ
+document.getElementById('startButton').addEventListener('click', () => {
+    if (words.length === 0) {
+        loadWordsCSV().then(startQuiz).catch(e => alert(e.message));
+    } else {
+        startQuiz();
+    }
+});
 document.getElementById('nextButton').addEventListener('click', nextQuestion);
 document.getElementById('backButton').addEventListener('click', resetQuiz);
 document.getElementById('showRankingButton').addEventListener('click', () => {
@@ -125,7 +143,6 @@ function checkAnswer(selectedOption) {
 function endQuiz() {
     document.getElementById('quiz').classList.add('hidden');
     document.getElementById('backButton').classList.remove('hidden');
-    // --- ランキング登録 ---
     setTimeout(() => {
         let userName = prompt("クイズ終了! 正解数: " + correctAnswers + " / " + totalQuestions + "\n名前を入力してください（ランキングに登録されます）:");
         if (!userName) userName = "名無し";
@@ -157,7 +174,6 @@ function saveRanking(userName, score, questionCount) {
     let rankings = JSON.parse(localStorage.getItem("rankings") || '{}');
     if (!rankings[questionCount]) rankings[questionCount] = [];
     rankings[questionCount].push({ name: userName, score: score, date: new Date().toLocaleString() });
-    // スコア降順で並べ替え、上位5件だけ残す
     rankings[questionCount].sort((a, b) => b.score - a.score);
     rankings[questionCount] = rankings[questionCount].slice(0, 5);
     localStorage.setItem("rankings", JSON.stringify(rankings));
@@ -173,7 +189,6 @@ function showRanking(questionCount = null) {
     let list = document.getElementById('rankingList');
     list.innerHTML = "";
 
-    // 出題数で絞り込み
     let keys = Object.keys(rankings).sort((a, b) => parseInt(a) - parseInt(b));
     if (questionCount !== null) {
         keys = keys.filter(k => parseInt(k) === questionCount);
