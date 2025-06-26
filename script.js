@@ -1,148 +1,138 @@
-let words = [];
+const words = [
+    { number: 1, word: "apple", meaning: "りんご" },
+    { number: 2, word: "banana", meaning: "バナナ" },
+    { number: 3, word: "grape", meaning: "ぶどう" },
+    { number: 4, word: "orange", meaning: "オレンジ" },
+    { number: 5, word: "peach", meaning: "もも" },
+    { number: 6, word: "kiwi", meaning: "キウイ" },
+    { number: 7, word: "strawberry", meaning: "いちご" },
+    { number: 8, word: "melon", meaning: "メロン" },
+    // 必要に応じて単語を追加
+];
+
 let currentQuestionIndex = 0;
+let correctAnswers = 0;
 let totalQuestions = 0;
-let score = 0;
-let selectedWords = []; // 選択された問題を保持
-let rankings = {}; // 問題数ごとのランキングを保持
+let selectedRange = [];
+let lastCorrectAnswer = null;
 
-// CSVファイルを読み込む関数
-async function loadCSV() {
-    const response = await fetch('words.csv'); // CSVファイルのパス
-    const data = await response.text();
-    const rows = data.split('\n').slice(1); // ヘッダーを除く
-    words = rows.map(row => {
-        const [number, word, meaning] = row.split(',');
-        return { number: parseInt(number), word, meaning };
-    });
-}
+document.getElementById('startButton').addEventListener('click', startQuiz);
+document.getElementById('nextButton').addEventListener('click', nextQuestion);
+document.getElementById('backButton').addEventListener('click', resetQuiz);
 
-// クイズを開始する関数
 function startQuiz() {
-    const start = parseInt(document.getElementById('start').value);
-    const end = parseInt(document.getElementById('end').value);
+    const startNum = parseInt(document.getElementById('startNum').value);
+    const endNum = parseInt(document.getElementById('endNum').value);
     totalQuestions = parseInt(document.getElementById('questionCount').value);
 
-    // 指定された範囲の単語をフィルタリング
-    const filteredWords = words.filter(word => word.number >= start && word.number <= end);
-    
-    if (filteredWords.length === 0) {
-        document.getElementById('quiz').innerHTML = "<p>指定された範囲に単語がありません。</p>";
+    // バリデーション
+    if (isNaN(startNum) || isNaN(endNum) || isNaN(totalQuestions) ||
+        startNum < 1 || endNum < startNum || totalQuestions < 1) {
+        alert("入力値を正しく設定してください。");
         return;
     }
 
-    // ランダムに問題を選択
-    selectedWords = [];
-    while (selectedWords.length < totalQuestions) {
-        const randomIndex = Math.floor(Math.random() * filteredWords.length);
-        const selectedWord = filteredWords[randomIndex];
-        if (!selectedWords.includes(selectedWord)) {
-            selectedWords.push(selectedWord);
-        }
+    selectedRange = words.filter(word => word.number >= startNum && word.number <= endNum);
+
+    if (selectedRange.length === 0) {
+        alert("その範囲に単語がありません。");
+        return;
+    }
+    if (totalQuestions > selectedRange.length) {
+        alert(`出題数が範囲内の単語数を超えています。最大${selectedRange.length}問まで設定してください。`);
+        return;
     }
 
     currentQuestionIndex = 0;
-    score = 0;
-    document.getElementById('nextQuestion').style.display = 'none'; // 次の問題ボタンを非表示
-    showQuestion();
+    correctAnswers = 0;
+
+    document.getElementById('settings').classList.add('hidden');
+    document.getElementById('quiz').classList.remove('hidden');
+    document.getElementById('backButton').classList.add('hidden');
+    document.getElementById('result').classList.add('hidden');
+    document.getElementById('nextButton').classList.add('hidden');
+
+    nextQuestion();
 }
 
-// 問題を表示する関数
-function showQuestion() {
-    if (currentQuestionIndex >= selectedWords.length) {
-        document.getElementById('quiz').innerHTML = `<p>クイズ終了！あなたの得点: ${score}/${totalQuestions}</p>`;
-        document.getElementById('nextQuestion').style.display = 'none'; // ボタンを非表示
-        updateRanking(); // ランキングを更新
-        return;
+function nextQuestion() {
+    document.getElementById('result').classList.add('hidden');
+    document.getElementById('nextButton').classList.add('hidden');
+
+    if (currentQuestionIndex < totalQuestions) {
+        const questionData = getRandomQuestion();
+        lastCorrectAnswer = questionData.correctAnswer;
+        document.getElementById('question').innerText = questionData.word;
+        document.getElementById('options').innerHTML = '';
+
+        questionData.options.forEach(option => {
+            const button = document.createElement('button');
+            button.innerText = option.meaning;
+            button.onclick = () => checkAnswer(option);
+            document.getElementById('options').appendChild(button);
+        });
+
+        currentQuestionIndex++;
+    } else {
+        endQuiz();
     }
-
-    const currentWord = selectedWords[currentQuestionIndex];
-    const options = generateOptions(currentWord, selectedWords);
-    const quizHtml = `
-        <p>単語の意味は何ですか？</p>
-        <p>${currentWord.meaning}</p>
-        ${options.map(option => `<div class="answer" onclick="checkAnswer('${option.word}', '${currentWord.word}')">${option.word}</div>`).join('')}
-    `;
-    document.getElementById('quiz').innerHTML = quizHtml;
 }
 
-// 選択肢を生成する関数
-function generateOptions(currentWord, selectedWords) {
-    const options = [currentWord];
-    const maxOptions = Math.min(4, selectedWords.length); // 最大選択肢数を調整
+function getRandomQuestion() {
+    // 出題単語をランダム取得（被り防止したい場合はselectedRangeから除外していくと良い）
+    const correctAnswer = selectedRange[Math.floor(Math.random() * selectedRange.length)];
+    const options = [correctAnswer];
 
-    while (options.length < maxOptions) {
-        const randomIndex = Math.floor(Math.random() * selectedWords.length);
-        const randomWord = selectedWords[randomIndex];
-        if (!options.includes(randomWord)) {
-            options.push(randomWord);
+    // 選択肢数は範囲内単語数まで
+    while (options.length < Math.min(5, selectedRange.length)) {
+        const randomOption = selectedRange[Math.floor(Math.random() * selectedRange.length)];
+        if (!options.includes(randomOption)) {
+            options.push(randomOption);
         }
     }
 
-    return shuffleArray(options);
+    return {
+        word: correctAnswer.word,
+        correctAnswer: correctAnswer,
+        options: shuffleArray(options)
+    };
 }
 
-// 正誤判定を行う関数
-function checkAnswer(selected, correct) {
-    const isCorrect = selected === correct;
-    if (isCorrect) {
-        score++;
-        document.getElementById('result').innerHTML = "<p>正解！</p>";
+function checkAnswer(selectedOption) {
+    const resultDiv = document.getElementById('result');
+    const correctMeaning = lastCorrectAnswer.meaning;
+
+    if (selectedOption.meaning === correctMeaning) {
+        correctAnswers++;
+        resultDiv.innerText = `正解! 意味: ${correctMeaning}`;
     } else {
-        document.getElementById('result').innerHTML = `<p>不正解。正しい答えは "${correct}" です。</p>`;
+        resultDiv.innerText = `不正解。正しい意味: ${correctMeaning}`;
     }
-    currentQuestionIndex++;
-    document.getElementById('nextQuestion').style.display = 'block'; // 次の問題ボタンを表示
+
+    resultDiv.classList.remove('hidden');
+    document.getElementById('nextButton').classList.remove('hidden');
 }
 
-// 配列をシャッフルする関数
+function endQuiz() {
+    document.getElementById('quiz').classList.add('hidden');
+    document.getElementById('backButton').classList.remove('hidden');
+    alert(`クイズ終了! 正解数: ${correctAnswers} / ${totalQuestions}`);
+}
+
+function resetQuiz() {
+    document.getElementById('settings').classList.remove('hidden');
+    document.getElementById('backButton').classList.add('hidden');
+    document.getElementById('quiz').classList.add('hidden');
+    document.getElementById('result').classList.add('hidden');
+    document.getElementById('options').innerHTML = '';
+    document.getElementById('question').innerText = '';
+}
+
 function shuffleArray(array) {
+    // Fisher-Yatesシャッフル
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
 }
-
-// ランキングを更新する関数
-function updateRanking() {
-    const playerName = prompt("あなたの名前を入力してください:");
-    if (playerName) { // 名前が入力された場合のみ追加
-        if (!rankings[totalQuestions]) {
-            rankings[totalQuestions] = []; // 新しい出題数のランキングを初期化
-        }
-        rankings[totalQuestions].push({ name: playerName, score: score }); // ランキングに追加
-        displayRanking(); // ランキングを表示
-    }
-}
-
-// ランキングを表示する関数
-function displayRanking() {
-    const rankingsContainer = document.getElementById('rankings-container');
-    rankingsContainer.innerHTML = ''; // 既存のデータをクリア
-
-    for (const questionCount in rankings) {
-        const rankingBody = document.createElement('div');
-        rankingBody.innerHTML = `<h3>${questionCount} 問出題のランキング</h3><table><thead><tr><th>順位</th><th>プレイヤー名</th><th>得点</th></tr></thead><tbody></tbody></table>`;
-        const tbody = rankingBody.querySelector('tbody');
-
-        // 得点でソート
-        const sortedRankings = rankings[questionCount].sort((a, b) => b.score - a.score);
-        sortedRankings.forEach((entry, index) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `<td>${index + 1}</td><td>${entry.name}</td><td>${entry.score}</td>`;
-            tbody.appendChild(row);
-        });
-
-        rankingsContainer.appendChild(rankingBody); // ランキングを追加
-    }
-}
-
-// DOMContentLoadedイベントで初期化
-document.addEventListener('DOMContentLoaded', () => {
-    loadCSV();
-    document.getElementById('startQuiz').addEventListener('click', startQuiz);
-    document.getElementById('nextQuestion').addEventListener('click', () => {
-        document.getElementById('result').innerHTML = ""; // 結果をクリア
-        showQuestion(); // 次の問題を表示
-    });
-});
