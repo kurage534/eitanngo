@@ -1,8 +1,10 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Meiryo", "Arial", "sans-serif";
     background-color: #f4f4f4;
     margin: 0;
     padding: 20px;
+    letter-spacing: 0.05em;
+    color: #222;
 }
 
 .container {
@@ -16,6 +18,22 @@ body {
 
 h1, h2 {
     text-align: center;
+    font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Meiryo", "Arial", "sans-serif";
+    letter-spacing: 0.1em;
+    color: #154c9f;
+}
+
+label, input, button, div, ul, li {
+    font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Meiryo", "Arial", "sans-serif";
+    font-size: 1.08em;
+}
+
+input[type="number"] {
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 1.08em;
+    margin: 0 5px 5px 0;
 }
 
 .hidden {
@@ -32,6 +50,10 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    font-weight: 600;
+    font-size: 1.08em;
+    letter-spacing: 0.1em;
+    transition: background-color 0.2s;
 }
 
 button:hover {
