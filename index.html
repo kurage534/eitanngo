@@ -10,6 +10,11 @@
     <div class="container">
         <h1>英単語テスト</h1>
         <div id="settings">
+            <!-- CSVファイル選択(ローカル用) -->
+            <label for="csvFile">単語CSVファイル選択：</label>
+            <input type="file" id="csvFile" accept=".csv">
+            <button id="loadCsvButton" type="button">CSV読み込み</button>
+            <br>
             <label for="startNum">出題範囲（番号）：</label>
             <input type="number" id="startNum" min="1" required>
             <label for="endNum">〜</label>
