@@ -43,6 +43,8 @@ document.getElementById('showRankingButton').addEventListener('click', () => {
 document.getElementById('closeRankingButton').addEventListener('click', () => {
     document.getElementById('ranking').classList.add('hidden');
     document.getElementById('settings').classList.remove('hidden');
+    document.getElementById('quiz').classList.add('hidden');
+    document.getElementById('backButton').classList.add('hidden');
 });
 document.getElementById('filterRankingButton').addEventListener('click', () => {
     const count = parseInt(document.getElementById('rankingQuestionCount').value);
