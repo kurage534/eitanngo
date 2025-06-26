@@ -68,7 +68,8 @@ function showQuestion() {
 // 選択肢を生成する関数
 function generateOptions(currentWord, selectedWords) {
     const options = [currentWord];
-    while (options.length < 4) {
+    const additionalCount = Math.min(3, selectedWords.length - 1); // 追加する選択肢の数を調整
+    while (options.length < 1 + additionalCount) {
         const randomIndex = Math.floor(Math.random() * selectedWords.length);
         const randomWord = selectedWords[randomIndex];
         if (!options.includes(randomWord)) {
