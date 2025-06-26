@@ -1,10 +1,10 @@
 body {
-    font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Meiryo", "Arial", "sans-serif";
+    font-family: "Meiryo", "Yu Gothic", "Hiragino Kaku Gothic ProN", "Arial", "sans-serif";
     background-color: #f4f4f4;
     margin: 0;
     padding: 20px;
     letter-spacing: 0.05em;
-    color: #222;
+    color: #212121;
 }
 
 .container {
@@ -18,13 +18,13 @@ body {
 
 h1, h2 {
     text-align: center;
-    font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Meiryo", "Arial", "sans-serif";
+    font-family: "Meiryo", "Yu Gothic", "Hiragino Kaku Gothic ProN", "Arial", "sans-serif";
     letter-spacing: 0.1em;
     color: #154c9f;
 }
 
 label, input, button, div, ul, li {
-    font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Meiryo", "Arial", "sans-serif";
+    font-family: "Meiryo", "Yu Gothic", "Hiragino Kaku Gothic ProN", "Arial", "sans-serif";
     font-size: 1.08em;
 }
 
