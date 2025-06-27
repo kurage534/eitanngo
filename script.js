@@ -55,6 +55,36 @@ document.getElementById('filterRankingButton').addEventListener('click', () => {
     showRanking(isNaN(count) ? null : count);
 });
 
+// --- ランキングリセット機能追加 ---
+// 管理用パスワード（必要に応じて変更可）
+const RANKING_RESET_PASSWORD = 'eitanngo2024';
+
+// 「ランキングリセット」ボタンの生成とイベント付与
+(function setupRankingResetButton() {
+    const resetBtn = document.createElement('button');
+    resetBtn.id = 'resetRankingButton';
+    resetBtn.type = 'button';
+    resetBtn.textContent = 'ランキングをリセット';
+    resetBtn.style.background = "#d9534f";
+    resetBtn.style.marginTop = "20px";
+    resetBtn.style.fontWeight = "bold";
+    const rankingDiv = document.getElementById('ranking');
+    rankingDiv.appendChild(resetBtn);
+
+    resetBtn.addEventListener('click', () => {
+        const pw = prompt("ランキングをリセットするにはパスワードを入力してください:");
+        if (pw === null) return;
+        if (pw === RANKING_RESET_PASSWORD) {
+            localStorage.removeItem("rankings");
+            alert("ランキングをリセットしました。");
+            showRanking();
+        } else {
+            alert("パスワードが違います。");
+        }
+    });
+})();
+// ----------------------------
+
 function startQuiz() {
     const startNum = parseInt(document.getElementById('startNum').value);
     const endNum = parseInt(document.getElementById('endNum').value);
