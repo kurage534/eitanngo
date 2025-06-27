@@ -41,10 +41,14 @@ document.getElementById('showRankingButton').addEventListener('click', () => {
     showRanking();
 });
 document.getElementById('closeRankingButton').addEventListener('click', () => {
+    // ランキング画面を閉じ、設定画面以外を全て隠す
     document.getElementById('ranking').classList.add('hidden');
     document.getElementById('settings').classList.remove('hidden');
     document.getElementById('quiz').classList.add('hidden');
     document.getElementById('backButton').classList.add('hidden');
+    document.getElementById('result').classList.add('hidden');
+    document.getElementById('options').innerHTML = '';
+    document.getElementById('question').innerText = '';
 });
 document.getElementById('filterRankingButton').addEventListener('click', () => {
     const count = parseInt(document.getElementById('rankingQuestionCount').value);
