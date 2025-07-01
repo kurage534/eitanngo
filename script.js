@@ -41,7 +41,6 @@ document.getElementById('showRankingButton').addEventListener('click', () => {
     showRanking();
 });
 document.getElementById('closeRankingButton').addEventListener('click', () => {
-    // ランキング画面を閉じ、設定画面以外を全て隠す
     document.getElementById('ranking').classList.add('hidden');
     document.getElementById('settings').classList.remove('hidden');
     document.getElementById('quiz').classList.add('hidden');
@@ -55,11 +54,9 @@ document.getElementById('filterRankingButton').addEventListener('click', () => {
     showRanking(isNaN(count) ? null : count);
 });
 
-// --- ランキングリセット機能追加 ---
-// 管理用パスワード（必要に応じて変更可）
-const RANKING_RESET_PASSWORD = 'Kurage0805';
+// --- ランキングリセット機能 ---
+const RANKING_RESET_PASSWORD = 'eitanngo2024'; // ここを書き換えて保存＆スーパーリロード
 
-// 「ランキングリセット」ボタンの生成とイベント付与
 (function setupRankingResetButton() {
     const resetBtn = document.createElement('button');
     resetBtn.id = 'resetRankingButton';
@@ -143,17 +140,18 @@ function nextQuestion() {
     }
 }
 
+// ★修正版：選択肢は出題範囲から重複なしで
 function getRandomQuestion() {
     const correctAnswer = selectedRange[Math.floor(Math.random() * selectedRange.length)];
     const options = [correctAnswer];
-
+    let usedNumbers = new Set([correctAnswer.number]);
     while (options.length < Math.min(5, selectedRange.length)) {
         const randomOption = selectedRange[Math.floor(Math.random() * selectedRange.length)];
-        if (!options.includes(randomOption)) {
+        if (!usedNumbers.has(randomOption.number)) {
             options.push(randomOption);
+            usedNumbers.add(randomOption.number);
         }
     }
-
     return {
         word: correctAnswer.word,
         correctAnswer: correctAnswer,
@@ -184,7 +182,7 @@ function endQuiz() {
         if (!userName) userName = "名無し";
         saveRanking(userName, correctAnswers, totalQuestions);
         showRanking(totalQuestions);
-    }, 100); // alertの後にpromptを表示するためtimeout
+    }, 100);
 }
 
 function resetQuiz() {
