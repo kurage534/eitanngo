@@ -4,6 +4,7 @@ let correctAnswers = 0;
 let totalQuestions = 0;
 let selectedRange = [];
 let lastCorrectAnswer = null;
+let quizQuestions = []; // 出題順序を保持
 
 // CSVを配列に変換する関数
 function parseCSV(text) {
@@ -55,7 +56,7 @@ document.getElementById('filterRankingButton').addEventListener('click', () => {
 });
 
 // --- ランキングリセット機能 ---
-const RANKING_RESET_PASSWORD = 'eitanngo2024'; // パスワードを変更したら保存＋スーパーリロード
+const RANKING_RESET_PASSWORD = 'eitanngo2024'; // 必要なら変更
 
 (function setupRankingResetButton() {
     const resetBtn = document.createElement('button');
@@ -105,6 +106,9 @@ function startQuiz() {
         return;
     }
 
+    // 出題問題リストをランダムに作成（重複なし）
+    quizQuestions = shuffleArray([...selectedRange]).slice(0, totalQuestions);
+
     currentQuestionIndex = 0;
     correctAnswers = 0;
 
@@ -121,7 +125,7 @@ function nextQuestion() {
     document.getElementById('result').classList.add('hidden');
     document.getElementById('nextButton').classList.add('hidden');
 
-    if (currentQuestionIndex < totalQuestions) {
+    if (currentQuestionIndex < quizQuestions.length) {
         const questionData = getRandomQuestion();
         lastCorrectAnswer = questionData.correctAnswer;
         document.getElementById('question').innerText = questionData.word;
@@ -142,8 +146,8 @@ function nextQuestion() {
 
 // ---- 問題範囲外も選択肢に含めるバージョン ----
 function getRandomQuestion() {
-    // 出題対象から問題をランダム取得
-    const correctAnswer = selectedRange[Math.floor(Math.random() * selectedRange.length)];
+    // quizQuestions から順に出題
+    const correctAnswer = quizQuestions[currentQuestionIndex];
     const options = [correctAnswer];
     let usedNumbers = new Set([correctAnswer.number]);
 
@@ -156,13 +160,10 @@ function getRandomQuestion() {
     while (options.length < Math.min(5, words.length)) {
         let sourceList;
         if (options.length < 2 && selectedRange.length > options.length) {
-            // 2つ目までは範囲内から
             sourceList = selectedRange.filter(word => !usedNumbers.has(word.number));
         } else if (outOfRange.length > 0) {
-            // それ以降は範囲外から
             sourceList = outOfRange.filter(word => !usedNumbers.has(word.number));
         } else {
-            // それでも足りなければ全単語から
             sourceList = words.filter(word => !usedNumbers.has(word.number));
         }
         if (sourceList.length === 0) break;
@@ -170,7 +171,6 @@ function getRandomQuestion() {
         options.push(randomOption);
         usedNumbers.add(randomOption.number);
     }
-    // 選択肢をシャッフル
     return {
         word: correctAnswer.word,
         correctAnswer: correctAnswer,
