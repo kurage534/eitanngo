@@ -4,7 +4,7 @@ let correctAnswers = 0;
 let totalQuestions = 0;
 let selectedRange = [];
 let lastCorrectAnswer = null;
-let quizQuestions = []; // 出題順序を保持
+let quizQuestions = []; // 出題順序を保持（重複なし）
 
 // CSVを配列に変換する関数
 function parseCSV(text) {
@@ -146,7 +146,7 @@ function nextQuestion() {
 
 // ---- 問題範囲外も選択肢に含めるバージョン ----
 function getRandomQuestion() {
-    // quizQuestions から順に出題
+    // quizQuestions から順に出題（重複なし）
     const correctAnswer = quizQuestions[currentQuestionIndex];
     const options = [correctAnswer];
     let usedNumbers = new Set([correctAnswer.number]);
