@@ -55,7 +55,7 @@ document.getElementById('filterRankingButton').addEventListener('click', () => {
 });
 
 // --- ランキングリセット機能 ---
-const RANKING_RESET_PASSWORD = 'Kurage0805'; // ここを書き換えて保存＆スーパーリロード
+const RANKING_RESET_PASSWORD = 'eitanngo2024'; // パスワードを変更したら保存＋スーパーリロード
 
 (function setupRankingResetButton() {
     const resetBtn = document.createElement('button');
@@ -140,24 +140,44 @@ function nextQuestion() {
     }
 }
 
-// ★修正版：選択肢は出題範囲から重複なしで
+// ---- 問題範囲外も選択肢に含めるバージョン ----
 function getRandomQuestion() {
+    // 出題対象から問題をランダム取得
     const correctAnswer = selectedRange[Math.floor(Math.random() * selectedRange.length)];
     const options = [correctAnswer];
     let usedNumbers = new Set([correctAnswer.number]);
-    while (options.length < Math.min(5, selectedRange.length)) {
-        const randomOption = selectedRange[Math.floor(Math.random() * selectedRange.length)];
-        if (!usedNumbers.has(randomOption.number)) {
-            options.push(randomOption);
-            usedNumbers.add(randomOption.number);
+
+    // selectedRange外の単語リストを作成
+    const outOfRange = words.filter(word => 
+        !usedNumbers.has(word.number) && !selectedRange.some(w => w.number === word.number)
+    );
+
+    // 2択目までは範囲内、3択目以降は範囲外も混ぜる
+    while (options.length < Math.min(5, words.length)) {
+        let sourceList;
+        if (options.length < 2 && selectedRange.length > options.length) {
+            // 2つ目までは範囲内から
+            sourceList = selectedRange.filter(word => !usedNumbers.has(word.number));
+        } else if (outOfRange.length > 0) {
+            // それ以降は範囲外から
+            sourceList = outOfRange.filter(word => !usedNumbers.has(word.number));
+        } else {
+            // それでも足りなければ全単語から
+            sourceList = words.filter(word => !usedNumbers.has(word.number));
         }
+        if (sourceList.length === 0) break;
+        const randomOption = sourceList[Math.floor(Math.random() * sourceList.length)];
+        options.push(randomOption);
+        usedNumbers.add(randomOption.number);
     }
+    // 選択肢をシャッフル
     return {
         word: correctAnswer.word,
         correctAnswer: correctAnswer,
         options: shuffleArray(options)
     };
 }
+// ---- ここまで ----
 
 function checkAnswer(selectedOption) {
     const resultDiv = document.getElementById('result');
