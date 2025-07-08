@@ -56,7 +56,8 @@ document.getElementById('filterRankingButton').addEventListener('click', () => {
 });
 
 // --- ランキングリセット機能 ---
-const RANKING_RESET_PASSWORD = 'Kurage0805'; // 必要なら変更
+// ここを書き換えて保存
+const RANKING_RESET_PASSWORD = 'mysecret2025'; // 必要なら変更
 
 (function setupRankingResetButton() {
     const resetBtn = document.createElement('button');
