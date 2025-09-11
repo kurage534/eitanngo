@@ -1,54 +1,63 @@
-// --- ランキング機能の追加 ---
-function saveCorrectAnswer(userName, correctAnswers) {
-    // localStorageから既存データを取得
-    const currentData = JSON.parse(localStorage.getItem('quizResults')) || [];
-    // 新しい結果を追加
-    currentData.push({
-        name: userName,
-        score: correctAnswers,
-        timestamp: new Date().toISOString()
-    });
-    // localStorageに保存
-    localStorage.setItem('quizResults', JSON.stringify(currentData));
+let username = "";
+let mode = "en2ja";
+let score = 0;
+
+async function startQuiz() {
+  username = document.getElementById("username").value;
+  mode = document.getElementById("mode").value;
+  score = 0;
+
+  document.getElementById("setup").style.display = "none";
+  document.getElementById("quiz").style.display = "block";
+  nextQuestion();
 }
 
-function showRanking() {
-    // localStorageからランキングデータを取得
-    const rankingData = JSON.parse(localStorage.getItem('quizResults')) || [];
-    const rankingList = document.getElementById('rankingList');
-    rankingList.innerHTML = '';
+async function nextQuestion() {
+  const res = await fetch(`/quiz?mode=${mode}`);
+  const data = await res.json();
 
-    // データをスコア順にソート
-    rankingData.sort((a, b) => b.score - a.score);
+  document.getElementById("question").innerText = data.question;
+  const choicesDiv = document.getElementById("choices");
+  choicesDiv.innerHTML = "";
 
-    // ランキングをリストに追加
-    rankingData.forEach((entry, index) => {
-        const listItem = document.createElement('li');
-        listItem.textContent = `${index + 1}. ${entry.name} - ${entry.score}点 (${new Date(entry.timestamp).toLocaleString()})`;
-        rankingList.appendChild(listItem);
-    });
-
-    // ランキング画面を表示
-    document.getElementById('ranking').classList.remove('hidden');
+  data.choices.forEach(choice => {
+    const btn = document.createElement("button");
+    btn.innerText = choice;
+    btn.onclick = () => submitAnswer(data, choice);
+    choicesDiv.appendChild(btn);
+  });
 }
 
-// --- クイズ終了時に正解数を保存 ---
-function endQuiz() {
-    document.getElementById('quiz').classList.add('hidden');
-    document.getElementById('backButton').classList.remove('hidden');
-    setTimeout(() => {
-        // ユーザー名を取得
-        const userName = prompt(`クイズ終了! 正解数: ${correctAnswers} / ${totalQuestions}\n名前を入力してください:`) || "名無し";
-        // 正解数を保存
-        saveCorrectAnswer(userName, correctAnswers);
-        alert("結果が保存されました。");
-        // ランキングを表示
-        showRanking();
-    }, 100);
+async function submitAnswer(data, choice) {
+  const formData = new FormData();
+  formData.append("username", username);
+  formData.append("question", data.question);
+  formData.append("answer", data.answer);
+  formData.append("user_answer", choice);
+
+  const res = await fetch("/answer", { method: "POST", body: formData });
+  const result = await res.json();
+
+  if (result.correct) {
+    document.getElementById("result").innerText = "正解！";
+    score++;
+  } else {
+    document.getElementById("result").innerText = `不正解！ 正解は ${data.answer}`;
+  }
+
+  setTimeout(nextQuestion, 1000);
 }
 
-// --- HTMLボタンのイベントリスナー ---
-document.getElementById('showRankingButton').addEventListener('click', showRanking);
-document.getElementById('closeRankingButton').addEventListener('click', () => {
-    document.getElementById('ranking').classList.add('hidden');
-});
+async function loadRanking() {
+  const res = await fetch("/ranking");
+  const ranking = await res.json();
+  const list = document.getElementById("ranking-list");
+  list.innerHTML = "";
+  ranking.forEach(r => {
+    const li = document.createElement("li");
+    li.innerText = `${r.username} - ${r.score}`;
+    list.appendChild(li);
+  });
+}
+
+setInterval(loadRanking, 5000); // 5秒ごとに更新
