@@ -189,6 +189,10 @@ function checkAnswer(selectedOption) {
     const resultDiv = document.getElementById('result');
     const correctMeaning = lastCorrectAnswer.meaning;
 
+    // すべての選択肢ボタンを無効化
+    const optionButtons = document.querySelectorAll('#options button');
+    optionButtons.forEach(btn => btn.disabled = true);
+
     if (selectedOption.meaning === correctMeaning) {
         correctAnswers++;
         resultDiv.innerText = `正解! 意味: ${correctMeaning}`;
