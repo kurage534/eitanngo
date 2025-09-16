@@ -1,10 +1,10 @@
-
 let currentQuestionIndex = 0;
 let correctAnswers = 0;
 let totalQuestions = 0;
 let selectedRange = [];
 let lastCorrectAnswer = null;
-let quizQuestions = []; // 出題順序を保持（重複なし）
+let quizQuestions = [];
+let words = [];
 
 // CSVを配列に変換する関数
 function parseCSV(text) {
@@ -13,6 +13,9 @@ function parseCSV(text) {
         let [number, word, meaning] = line.replace(/^﻿/, '').split(',');
         number = parseInt(number, 10);
         return { number, word, meaning };
+    });
+}
+
 // 正解数を保存する関数
 function saveCorrectAnswer(userName, correctAnswers) {
     const currentData = JSON.parse(localStorage.getItem('quizResults')) || [];
@@ -64,8 +67,7 @@ document.getElementById('filterRankingButton').addEventListener('click', () => {
 });
 
 // --- ランキングリセット機能 ---
-// ここを書き換えて保存
-const RANKING_RESET_PASSWORD = 'Kurage0805'; // 必要なら変更
+const RANKING_RESET_PASSWORD = 'Kurage0805';
 
 (function setupRankingResetButton() {
     const resetBtn = document.createElement('button');
@@ -115,7 +117,6 @@ function startQuiz() {
         return;
     }
 
-    // 出題問題リストをランダムに作成（重複なし）
     quizQuestions = shuffleArray([...selectedRange]).slice(0, totalQuestions);
 
     currentQuestionIndex = 0;
@@ -155,17 +156,13 @@ function nextQuestion() {
 
 // ---- 問題範囲外も選択肢に含めるバージョン ----
 function getRandomQuestion() {
-    // quizQuestions から順に出題（重複なし）
     const correctAnswer = quizQuestions[currentQuestionIndex];
     const options = [correctAnswer];
     let usedNumbers = new Set([correctAnswer.number]);
-
-    // selectedRange外の単語リストを作成
-    const outOfRange = words.filter(word => 
+    const outOfRange = words.filter(word =>
         !usedNumbers.has(word.number) && !selectedRange.some(w => w.number === word.number)
     );
 
-    // 2択目までは範囲内、3択目以降は範囲外も混ぜる
     while (options.length < Math.min(5, words.length)) {
         let sourceList;
         if (options.length < 2 && selectedRange.length > options.length) {
@@ -212,7 +209,6 @@ function endQuiz() {
         if (!userName) userName = "名無し";
         saveRanking(userName, correctAnswers, totalQuestions);
         showRanking(totalQuestions);
-        const userName = prompt(`クイズ終了! 正解数: ${correctAnswers} / ${totalQuestions}\n名前を入力してください: `) || "名無し";
         saveCorrectAnswer(userName, correctAnswers);
         alert("結果が保存されました。");
     }, 100);
@@ -226,12 +222,8 @@ function resetQuiz() {
     document.getElementById('options').innerHTML = '';
     document.getElementById('question').innerText = '';
 }
-// ランキングを表示する関数
-function showRanking() {
-    const rankingData = JSON.parse(localStorage.getItem('quizResults')) || [];
-    const rankingList = document.getElementById('rankingList');
-    rankingList.innerHTML = '';
 
+// 配列シャッフル関数
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -241,7 +233,6 @@ function shuffleArray(array) {
 }
 
 // --- ランキング機能 ---
-
 function saveRanking(userName, score, questionCount) {
     let rankings = JSON.parse(localStorage.getItem("rankings") || '{}');
     if (!rankings[questionCount]) rankings[questionCount] = [];
@@ -250,12 +241,8 @@ function saveRanking(userName, score, questionCount) {
     rankings[questionCount] = rankings[questionCount].slice(0, 5);
     localStorage.setItem("rankings", JSON.stringify(rankings));
 }
-    rankingData.forEach((entry, index) => {
-        const listItem = document.createElement('li');
-        listItem.textContent = `${index + 1}. ${entry.name} - ${entry.score}点 (${new Date(entry.timestamp).toLocaleString()})`;
-        rankingList.appendChild(listItem);
-    });
 
+// ランキングを表示する関数
 function showRanking(questionCount = null) {
     document.getElementById('settings').classList.add('hidden');
     document.getElementById('quiz').classList.add('hidden');
