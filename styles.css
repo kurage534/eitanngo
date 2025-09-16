@@ -40,6 +40,28 @@ input[type="number"] {
     display: none;
 }
 
+/* 回答欄レイアウト修正ここから */
+#options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-height: 320px;   /* 必要に応じて調整 */
+    overflow-y: auto;
+    margin-bottom: 10px;
+    align-items: stretch;
+    justify-content: flex-start;
+}
+#options button {
+    flex: 1 1 45%;
+    min-width: 120px;
+    max-width: 48%;
+    width: auto;
+    box-sizing: border-box;
+    margin-top: 0;
+}
+
+/* 回答欄レイアウト修正ここまで */
+
 button {
     display: block;
     width: 100%;
@@ -62,9 +84,4 @@ button:hover {
 
 #ranking {
     margin-top: 20px;
-}
-
-#rankingList > li {
-    list-style: none;
-    margin-bottom: 5px;
 }
