@@ -277,3 +277,4 @@ function showRanking(questionCount = null) {
         });
     });
 }
+
