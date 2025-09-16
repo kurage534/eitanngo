@@ -154,11 +154,12 @@ function nextQuestion() {
     }
 }
 
-// ---- 問題範囲外も選択肢に含めるバージョン ----
+// 重複しない意味で選択肢を作る
 function getRandomQuestion() {
     const correctAnswer = quizQuestions[currentQuestionIndex];
     const options = [correctAnswer];
     let usedNumbers = new Set([correctAnswer.number]);
+    let usedMeanings = new Set([correctAnswer.meaning]);
     const outOfRange = words.filter(word =>
         !usedNumbers.has(word.number) && !selectedRange.some(w => w.number === word.number)
     );
@@ -166,16 +167,23 @@ function getRandomQuestion() {
     while (options.length < Math.min(5, words.length)) {
         let sourceList;
         if (options.length < 2 && selectedRange.length > options.length) {
-            sourceList = selectedRange.filter(word => !usedNumbers.has(word.number));
+            sourceList = selectedRange.filter(word =>
+                !usedNumbers.has(word.number) && !usedMeanings.has(word.meaning)
+            );
         } else if (outOfRange.length > 0) {
-            sourceList = outOfRange.filter(word => !usedNumbers.has(word.number));
+            sourceList = outOfRange.filter(word =>
+                !usedNumbers.has(word.number) && !usedMeanings.has(word.meaning)
+            );
         } else {
-            sourceList = words.filter(word => !usedNumbers.has(word.number));
+            sourceList = words.filter(word =>
+                !usedNumbers.has(word.number) && !usedMeanings.has(word.meaning)
+            );
         }
         if (sourceList.length === 0) break;
         const randomOption = sourceList[Math.floor(Math.random() * sourceList.length)];
         options.push(randomOption);
         usedNumbers.add(randomOption.number);
+        usedMeanings.add(randomOption.meaning);
     }
     return {
         word: correctAnswer.word,
@@ -183,7 +191,6 @@ function getRandomQuestion() {
         options: shuffleArray(options)
     };
 }
-// ---- ここまで ----
 
 function checkAnswer(selectedOption) {
     const resultDiv = document.getElementById('result');
@@ -277,4 +284,3 @@ function showRanking(questionCount = null) {
         });
     });
 }
-
