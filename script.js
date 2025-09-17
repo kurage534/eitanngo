@@ -77,6 +77,7 @@ const RANKING_RESET_PASSWORD = 'Kurage0805';
     resetBtn.style.background = "#d9534f";
     resetBtn.style.marginTop = "20px";
     resetBtn.style.fontWeight = "bold";
+
     const rankingDiv = document.getElementById('ranking');
     rankingDiv.appendChild(resetBtn);
 
@@ -164,7 +165,10 @@ function getRandomQuestion() {
         !usedNumbers.has(word.number) && !selectedRange.some(w => w.number === word.number)
     );
 
-    while (options.length < Math.min(5, words.length)) {
+    // 範囲内や単語全体が5未満なら、その数だけ選択肢を作る
+    const optionCount = Math.min(5, selectedRange.length, words.length);
+
+    while (options.length < optionCount) {
         let sourceList;
         if (options.length < 2 && selectedRange.length > options.length) {
             sourceList = selectedRange.filter(word =>
