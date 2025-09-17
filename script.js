@@ -155,40 +155,31 @@ function nextQuestion() {
     }
 }
 
-// 重複しない意味で選択肢を作る
+// どんな範囲・全体でも必ず5択（または最大択）で重複無しに選択肢を作る
 function getRandomQuestion() {
     const correctAnswer = quizQuestions[currentQuestionIndex];
     const options = [correctAnswer];
     let usedNumbers = new Set([correctAnswer.number]);
     let usedMeanings = new Set([correctAnswer.meaning]);
-    const outOfRange = words.filter(word =>
-        !usedNumbers.has(word.number) && !selectedRange.some(w => w.number === word.number)
+
+    // まず範囲外も含めて「意味が重複しない」ものを集める
+    const allAlternatives = words.filter(word =>
+        !usedNumbers.has(word.number) && !usedMeanings.has(word.meaning)
     );
 
-    // 範囲内や単語全体が5未満なら、その数だけ選択肢を作る
-    const optionCount = Math.min(5, selectedRange.length, words.length);
+    // シャッフルしてから追加
+    shuffleArray(allAlternatives);
 
-    while (options.length < optionCount) {
-        let sourceList;
-        if (options.length < 2 && selectedRange.length > options.length) {
-            sourceList = selectedRange.filter(word =>
-                !usedNumbers.has(word.number) && !usedMeanings.has(word.meaning)
-            );
-        } else if (outOfRange.length > 0) {
-            sourceList = outOfRange.filter(word =>
-                !usedNumbers.has(word.number) && !usedMeanings.has(word.meaning)
-            );
-        } else {
-            sourceList = words.filter(word =>
-                !usedNumbers.has(word.number) && !usedMeanings.has(word.meaning)
-            );
-        }
-        if (sourceList.length === 0) break;
-        const randomOption = sourceList[Math.floor(Math.random() * sourceList.length)];
-        options.push(randomOption);
-        usedNumbers.add(randomOption.number);
-        usedMeanings.add(randomOption.meaning);
+    // 最大5択（または単語総数まで）
+    const optionCount = Math.min(5, words.length);
+
+    for (let i = 0; options.length < optionCount && i < allAlternatives.length; i++) {
+        options.push(allAlternatives[i]);
+        usedNumbers.add(allAlternatives[i].number);
+        usedMeanings.add(allAlternatives[i].meaning);
     }
+
+    // もし単語自体が少なくて足りない場合はその数だけ択を出す
     return {
         word: correctAnswer.word,
         correctAnswer: correctAnswer,
